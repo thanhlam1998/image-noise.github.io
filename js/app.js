@@ -1,12 +1,11 @@
 import * as THREE from "three";
 
+import FontFaceObserver from "fontfaceobserver";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import fragment from "./shaders/fragment.glsl";
+import imagesLoaded from "imagesloaded";
 import ocean from "../img/ocean.jpg";
 import vertex from "./shaders/vertex.glsl";
-
-let camera, scene, renderer;
-let geometry, material, mesh;
 
 export default class Sketch {
   constructor(options) {
@@ -29,12 +28,42 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     this.container.appendChild(this.renderer.domElement);
 
-    this.resize();
-    this.addControl();
+    this.images = [...document.querySelectorAll("img")];
 
-    this.setupResize();
-    this.addObjects();
-    this.render();
+    const fontOpen = new Promise((resolve) => {
+      new FontFaceObserver("Open Sans").load().then(() => {
+        resolve();
+      });
+    });
+
+    const fontPlayfair = new Promise((resolve) => {
+      new FontFaceObserver("Playfair Display").load().then(() => {
+        resolve();
+      });
+    });
+
+    // Preload images
+    const preloadImages = new Promise((resolve, reject) => {
+      imagesLoaded(
+        document.querySelectorAll("img"),
+        { background: true },
+        resolve
+      );
+    });
+
+    let allDone = [fontOpen, fontPlayfair, preloadImages];
+
+    Promise.all(allDone).then(() => {
+      // Store and add image to the right position
+      this.addImages();
+      this.setPosition();
+
+      this.resize();
+      this.addControl();
+      this.setupResize();
+      this.addObjects();
+      this.render();
+    });
   }
 
   addControl() {
@@ -54,8 +83,47 @@ export default class Sketch {
     this.camera.updateProjectionMatrix();
   }
 
+  addImages() {
+    this.imageStore = this.images.map((img) => {
+      let bounds = img.getBoundingClientRect();
+
+      let geometry = new THREE.PlaneBufferGeometry(
+        bounds.width,
+        bounds.height,
+        1,
+        1
+      );
+
+      let texture = new THREE.Texture(img);
+      texture.needsUpdate = true;
+      let material = new THREE.MeshBasicMaterial({
+        map: texture,
+      });
+
+      let mesh = new THREE.Mesh(geometry, material);
+
+      this.scene.add(mesh);
+
+      return {
+        img,
+        mesh,
+        top: bounds.top,
+        left: bounds.left,
+        width: bounds.width,
+        height: bounds.height,
+      };
+    });
+  }
+
+  setPosition() {
+    this.imageStore.forEach((o) => {
+      o.mesh.position.y = this.height / 2 - o.top - o.height / 2;
+      o.mesh.position.x = -this.width / 2 + o.left + o.width / 2;
+    });
+  }
+
   addObjects() {
-    this.geometry = new THREE.PlaneBufferGeometry(100, 100, 10, 10);
+    this.geometry = new THREE.PlaneBufferGeometry(200, 400, 10, 10);
 
     // this.geometry = new THREE.SphereBufferGeometry(0.4, 40, 40);
 

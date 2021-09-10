@@ -19,5 +19,8 @@
   "homepage": "https://github.com/thanhlam1998/three-js-image-noise#readme",
   "dependencies": {
     "three": "^0.132.2"
+  },
+  "devDependencies": {
+    "@parcel/transformer-glsl": "2.0.0-rc.0"
   }
 }

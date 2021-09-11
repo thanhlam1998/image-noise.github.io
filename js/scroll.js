@@ -76,7 +76,7 @@ export default class Scroll {
   render() {
     this.speed =
       Math.min(Math.abs(this.current - this.scrollToRender), 200) / 200;
-    this.speedTarget += (this.speed = this.speedTarget) * 0.2;
+    this.speedTarget += (this.speed - this.speedTarget) * 0.2;
 
     this.current = this.getScroll();
     this.scrollToRender = lerp(this.scrollToRender, this.current, this.ease);

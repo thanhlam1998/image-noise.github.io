@@ -117,14 +117,14 @@ export default class Sketch {
       ${noise}
         void main() {
           vec2 newUV = vUv;
-          float area = smoothstep(1.,0.7,vUv.y)*2. - 1.;
+          float area = smoothstep(1.,0.6,vUv.y)*2. - 1.;
           // area = pow(area,4.);
-          float noise = 0.5*(cnoise(vec3(vUv*10., time/2.)) + 1.);
+          float noise = 0.5*(cnoise(vec3(vUv*10., time)) + 1.);
           float n = smoothstep(0.5,0.51, noise + area);
-          newUV.x -= (vUv.x -0.5) * 0.1 * area * scrollSpeed;
+          newUV.x -= (vUv.x - 0.5) * 0.1 * area * scrollSpeed;
           gl_FragColor = texture2D(tDiffuse, newUV);
           // gl_FragColor = vec4(n,0.,0.,1.);
-          gl_FragColor = mix(vec4(1.), texture2D(tDiffuse, newUV), n);
+          gl_FragColor = mix(vec4(1.),texture2D( tDiffuse, newUV), n);
         }
       `,
     };
@@ -279,17 +279,14 @@ export default class Sketch {
     this.previousScroll = this.currentScroll;
     this.currentScroll = this.scroll.scrollToRender;
 
-    // if (Math.round(this.currentScroll) !== Math.round(this.previousScroll)) {
     this.setPosition();
     this.customPass.uniforms.scrollSpeed.value = this.scroll.speedTarget;
-
-    // this.customPass.uniforms.time.value = this.time;
+    this.customPass.uniforms.time.value = this.time;
 
     this.materials.forEach((m) => {
       m.uniforms.time.value = this.time;
     });
     this.composer.render();
-    // }
 
     window.requestAnimationFrame(this.render.bind(this));
   }

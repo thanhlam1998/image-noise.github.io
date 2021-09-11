@@ -32,6 +32,9 @@ export default class Sketch {
     this.camera.fov = 2 * Math.atan(this.height / 2 / 600) * (180 / Math.PI);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
     this.container.appendChild(this.renderer.domElement);
 
     this.images = [...document.querySelectorAll("img")];
@@ -60,6 +63,7 @@ export default class Sketch {
     let allDone = [fontOpen, fontPlayfair, preloadImages];
 
     this.currentScroll = 0;
+    this.previousScroll = 0;
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
@@ -272,19 +276,21 @@ export default class Sketch {
     this.time += 0.05;
 
     this.scroll.render();
+    this.previousScroll = this.currentScroll;
     this.currentScroll = this.scroll.scrollToRender;
+
+    // if (Math.round(this.currentScroll) !== Math.round(this.previousScroll)) {
     this.setPosition();
     this.customPass.uniforms.scrollSpeed.value = this.scroll.speedTarget;
-    this.customPass.uniforms.time.value = this.time;
+
+    // this.customPass.uniforms.time.value = this.time;
 
     this.materials.forEach((m) => {
       m.uniforms.time.value = this.time;
     });
-
-    // this.material.uniforms.time.value = this.time;
-
-    // this.renderer.render(this.scene, this.camera);\
     this.composer.render();
+    // }
+
     window.requestAnimationFrame(this.render.bind(this));
   }
 }

@@ -1,17 +1,18 @@
-import * as THREE from "three";
-
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import FontFaceObserver from "fontfaceobserver";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import Scroll from "./scroll";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import fragment from "./shaders/fragment.glsl";
 import gsap from "gsap";
 import imagesLoaded from "imagesloaded";
-import noise from "./shaders/noise.glsl";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import ocean from "../img/ocean.jpg";
+import Scroll from "./scroll";
+import fragment from "./shaders/fragment.glsl";
+import noise from "./shaders/noise.glsl";
 import vertex from "./shaders/vertex.glsl";
+
+console.log(process.env.LOCAL_ENV);
 
 export default class Sketch {
   constructor(options) {
